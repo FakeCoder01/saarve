@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Google Sign-In Example</title>
+  <meta name="google-signin-client_id"
+    content="769529200021-oelo810eeb0i86j1l0jaoat87bsb5a0g.apps.googleusercontent.com">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</head>
+
+<body>
+  <div id="g_id_onload" data-client_id="769529200021-oelo810eeb0i86j1l0jaoat87bsb5a0g.apps.googleusercontent.com"
+    data-context="signup" data-ux_mode="popup" data-callback="onSignIn" data-auto_select="true" data-itp_support="true">
+  </div>
+
+  <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="continue_with"
+    data-size="large" data-logo_alignment="left">
+  </div>
+
+</body>
+<script>
+  function createCookie(name, value, days) {
+    var expires;
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toGMTString();
+    }
+    else {
+      expires = "";
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+  }
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  if(getCookie('csrftoken') == null){
+    fetch('http://localhost:8000/cookie/csrf/')
+      .then((response) => response.json())
+      .then(data => {
+        createCookie("csrftoken", data.csrf_token, 1)
+      })
+  }
+
+  function onSignIn(g_response) {
+    const csrfToken = getCookie('csrftoken');
+    fetch('http://localhost:8000/auth/google/', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify({"id_token": g_response.credential}), 
+    })
+      .then((response) => console.log(response))
+      .catch(error => console.error(error));
+  }
+</script>
+
+</html>

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from google.oauth2 import id_token
 from google.auth.transport.requests import Request
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.middleware.csrf import get_token
 
 
@@ -21,9 +21,10 @@ def set_csrf_token(request):
 @permission_classes([])
 def google_login_access_token(request):
     token = request.data.get('id_token')
-    if not token:
+    usertype = request.data.get('usertype')
+
+    if not token or not usertype:
         return Response({'error': 'Invalid request'}, status=400)
-        
     try:
         idinfo = id_token.verify_oauth2_token(token, Request())
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
@@ -39,6 +40,12 @@ def google_login_access_token(request):
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=400)
     
+    match usertype:
+        case "doctor":
+            Group.objects.get("Doctors").user_set.add(user)
+        case "user":
+            Group.objects.get("Consumers").user_set.add(user)
+        
     token, created = Token.objects.get_or_create(user=user)
     return Response({'token': token.key}, status=200)
 

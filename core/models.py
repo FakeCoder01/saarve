@@ -17,7 +17,6 @@ class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
     created_at = models.DateField(auto_now_add=True)
     last_updated_at = models.DateField(auto_now=True)
-
     amount = models.FloatField()
     method = models.CharField(default="online", max_length=8)
     status = models.CharField(default="Initiated", max_length=10)

@@ -31,7 +31,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = [ "http://localhost:5500"]
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,7 +45,8 @@ INSTALLED_APPS = [
     'chat',
     'rest_framework',
     'corsheaders',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    
 ]
 
 

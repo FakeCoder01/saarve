@@ -21,8 +21,6 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 from django.urls import path
-from . import csrf_google
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),    
@@ -31,8 +29,4 @@ urlpatterns = [
     path('api/pharmacy/', include('pharmacy.urls'), name="pharmacy"),
     path('api/app/', include('app.urls'), name="app"),
     path('api/chat/', include('chat.urls'), name="chat"),
-
-    
-    path('cookie/csrf/', csrf_google.set_csrf_token, name="set_csrf_token"),
-    path('auth/google/', csrf_google.google_login_access_token, name="google_login_access_token"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

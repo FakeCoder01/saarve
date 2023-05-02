@@ -22,7 +22,7 @@ class Doctor(BaseModel):
     doctor_phone = models.CharField(max_length=60)
     doctor_description = models.TextField()
 
-    doctor_profile_pic = models.ImageField(upload_to="doctors/profile/")
+    doctor_profile_pic = models.ImageField(upload_to="doctors/profile/", default="default/doctor-d.jpg")
     doctor_services = models.TextField(null=True, blank=True)
 
     doctor_work_experience = models.TextField(null=True, blank=True) 
@@ -61,3 +61,5 @@ class DoctorSchedule(models.Model):
     def update_total_booked(self):
         self.total_booked += 1
         return self.total_booked
+    
+

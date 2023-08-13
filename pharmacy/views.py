@@ -56,7 +56,7 @@ class PharmacyProfileViewSet(viewsets.ModelViewSet):
         pharmacy = get_object_or_404(queryset, id=id)
         pharmacy.delete()
         return Response(status=204)
-    
+
 
 
 @api_view(['POST'])
@@ -133,3 +133,14 @@ def account_update_and_delete(request):
     if request.method == 'POST':
         serializer = RegisterSerializer(data=request.data)
     
+
+
+
+
+
+
+
+
+
+
+

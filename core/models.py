@@ -13,6 +13,7 @@ class BaseModel(models.Model):
     created_at = models.DateField(auto_now_add=True)
     last_updated_at = models.DateField(auto_now=True)
 
+
 class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
     created_at = models.DateField(auto_now_add=True)
@@ -26,6 +27,8 @@ class Payment(models.Model):
     def __str__(self) -> str:
         return self.payment_id
     
+
+
 class Appointment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
     created_at = models.DateField(auto_now_add=True)
@@ -43,10 +46,12 @@ class Appointment(models.Model):
 
     def __str__(self) -> str:
         return self.patient_name
-    
+
+
 class Booking(BaseModel):
     patient = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="patient_booking_profile")
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="doctor_booking_profile")
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name="pharmacy_booking_profile")
     payment = models.OneToOneField(Payment, on_delete=models.CASCADE, related_name="payment_booking_details")
     appointment = models.OneToOneField(Payment, on_delete=models.CASCADE, related_name="appointment_booking_detials")
+    status = models.BooleanField(default=False)

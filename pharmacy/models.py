@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password, make_password
 import uuid, datetime
-
+from app.models import UserProfile
 # Create your models here.
 
 
@@ -61,29 +61,29 @@ class Pharmacy(BaseModel):
     pharmacy_phone = models.CharField(max_length=60)
     pharmacy_rating = models.FloatField(default=0)
 
+    lat = models.FloatField(null=True, blank=True)
+    lng = models.FloatField(null=True, blank=True)
+
     is_verified = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.user.email
     
-    def get_pharmacy_images(self):
-        return {
-            "images" : list(PharmacyImage.objects.filter(pharmacy=self).values_list()) 
-        }
+
     
+    def get_num_of_docs(self):
+        return self.doctor_set.count()
+
     def get_pharmacy_reviews(self):
         return {
             "reviews" : list(PharmaReview.objects.filter(pharmacy=self).values())
         }
     
-    
-
-class PharmacyImage(models.Model):
-    pharmacy = models.ForeignKey(Pharmacy, related_name="pharmacy_images", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="pharmacy/images/")
 
 class PharmaReview(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True)
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name="pharmacy_review")
     review = models.TextField()
-    user = models.CharField(max_length=60)
-    created_at = models.DateField(auto_now=True)    
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="pharmacy_reviewed_by")
+    rating = models.PositiveSmallIntegerField(default=0, blank=True)
+    created_at = models.DateField(auto_now=True)

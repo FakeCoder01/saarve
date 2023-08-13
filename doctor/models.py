@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from pharmacy.models import Pharmacy
 import uuid
-
+from app.models import UserProfile
 
 # Create your models here.
 
@@ -30,9 +30,15 @@ class Doctor(BaseModel):
     doctor_rating = models.FloatField(default=0)
 
     pharmacies = models.ManyToManyField(Pharmacy)
+    doctor_address = models.CharField(max_length=256, null=True, blank=True)
+
+
 
     def __str__(self) -> str:
         return self.doctor_name
+    
+
+    
     
     def get_doctor_reviews(self):
         return {
@@ -40,9 +46,11 @@ class Doctor(BaseModel):
         }
     
 class DoctorReview(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="doctor_review")
     review = models.TextField()
-    user = models.CharField(max_length=60)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="doctor_reviewed_by")
+    rating = models.PositiveSmallIntegerField(default=0, blank=True)
     created_at = models.DateField(auto_now=True)
 
     def __str__(self) -> str:
@@ -53,7 +61,7 @@ class DoctorSchedule(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="doctor_schedule")
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name="pharmacy_schedule")
     start_time = models.DateTimeField()
-    end_time = models.DateField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
     duration = models.PositiveIntegerField(default=15)
     total_booked = models.PositiveIntegerField(default=0)
     fees = models.FloatField()

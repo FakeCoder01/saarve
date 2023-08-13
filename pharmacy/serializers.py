@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import Pharmacy, PharmacyImage, PharmaReview, PharmacyUser
+from .models import Pharmacy, PharmaReview, PharmacyUser
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
-
+from doctor.models import Doctor
 
 class PharmacyProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,4 +26,6 @@ class OTPVerificationSerializer(serializers.ModelSerializer):
     email = serializers.CharField(source="User.email")
     class Meta:
         model = PharmacyUser
-        fields = ('email', 'phone_number', 'email_otp', 'phone_otp')        
+        fields = ('email', 'phone_number', 'email_otp', 'phone_otp')                
+
+

@@ -1,8 +1,9 @@
 from django.urls import path
 from .views import UserProfileViewSet
-from . import search
 from .recomendor import Recommendation
-from . import pharmacy_api, doctor_api, appointment
+from . import pharmacy_api, doctor_api, booking, search
+from .apointment import AppointmentViewSet
+from .home_page_api import HomePageAPIViewSet
 
 
 urlpatterns = [
@@ -50,9 +51,14 @@ urlpatterns = [
     path("pharmacy/<str:pharmacy_id>/doctor/", pharmacy_api.doctors_in_a_pharmacy, name="doctors_in_a_pharmacy"),
 
     ## appointment & schedule
-    path("schedule/doctor/<str:doctor_id>/", appointment.doctor_schedules , name="doctor_schedules"),
-    path("appointment/doctor/<str:doctor_id>/pharmacy/<str:pharmacy_id>/schedule/<str:schedule_id>/", appointment.book_appointment, name="book_appointment"),
+    path("schedule/doctor/<str:doctor_id>/", booking.doctor_schedules , name="doctor_schedules"),
+    path("booking/doctor/<str:doctor_id>/pharmacy/<str:pharmacy_id>/schedule/<str:schedule_id>/", booking.book_appointment, name="book_appointment"),
 
+    path("appointment/<str:id>/", AppointmentViewSet.as_view({
+        "get" : "appointment_details",
+        "delete" : "destroy"
+    }), name="appointment"),
 
+    path("home/", HomePageAPIViewSet.as_view(), name="home_page_apis")
 
 ] 

@@ -71,8 +71,8 @@ class DoctorOverviewDetailsViewset(viewsets.ModelViewSet):
 
 
 @api_view(['GET'])
-@permission_classes([])
-@authentication_classes([])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def pharmacies_for_a_doctor(request, doctor_id):
     if not Doctor.objects.filter(id=doctor_id).exists():
         return Response(status=status.HTTP_404_NOT_FOUND)

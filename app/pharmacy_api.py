@@ -20,24 +20,24 @@ class PharmacyReviewViewSet(viewsets.ModelViewSet):
         self.pharmacy_id = pharmacy_id
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=200)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, pharmacy_id):
         try:
             if not Pharmacy.objects.filter(id=pharmacy_id).exists():
-                return Response({'detail' : 'no pharmacy found'}, status=404)
+                return Response({'detail' : 'no pharmacy found'}, status=status.HTTP_404_NOT_FOUND)
             pharmacy = Pharmacy.objects.get(id=pharmacy_id)
             if PharmaReview.objects.filter(pharmacy=pharmacy, user=self.request.user.user_profile).exists():
-                return Response({'detail' : 'already reviewd'}, status=401)
+                return Response({'detail' : 'already reviewd'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(pharmacy=pharmacy, user=self.request.user.user_profile)
-                return Response(serializer.data, status=201)
-            return Response({"detail" : "All fields are neccessary"}, status=400)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"detail" : "All fields are neccessary"}, status=status.HTTP_400_BAD_REQUEST)
         
         except Exception as err:
             print(err)
-            return Response({'detail' : 'something went wrong'}, status=500)   
+            return Response({'detail' : 'something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
     
     def destroy(self, request):
         
@@ -46,10 +46,10 @@ class PharmacyReviewViewSet(viewsets.ModelViewSet):
             try:
                 review = PharmaReview.objects.get(id=id, user=self.request.user.user_profile)
                 review.delete()
-                return Response({'detail' : 'deleted'}, status=200)
+                return Response({'detail' : 'deleted'}, status=status.HTTP_204_NO_CONTENT)
             except Exception as err:
                 print(err)
-                return Response({'detail' : 'error'}, status=400)   
+                return Response({'detail' : 'error'}, status=status.HTTP_400_BAD_REQUEST)   
 
 
 class PharmacyOverviewDetailsViewset(viewsets.ModelViewSet):
@@ -64,13 +64,13 @@ class PharmacyOverviewDetailsViewset(viewsets.ModelViewSet):
         self.pharmacy_id = pharmacy_id
         queryset = Pharmacy.objects.get(id=pharmacy_id)
         serializer = self.get_serializer(queryset)
-        return Response(serializer.data, status=200)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
 @api_view(['GET'])
-@permission_classes([])
-@authentication_classes([])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def doctors_in_a_pharmacy(request, pharmacy_id):
     if not Pharmacy.objects.filter(id=pharmacy_id).exists():
         return Response(status=status.HTTP_404_NOT_FOUND)

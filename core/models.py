@@ -16,25 +16,25 @@ class BaseModel(models.Model):
 
 class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
-    created_at = models.DateField(auto_now_add=True)
-    last_updated_at = models.DateField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_updated_at = models.DateTimeField(auto_now=True)
     amount = models.FloatField()
-    method = models.CharField(default="online", max_length=8)
-    status = models.CharField(default="Initiated", max_length=10)
+    method = models.CharField(default="noinput", max_length=8)
+    status = models.CharField(default="created", max_length=10)
     is_verified = models.BooleanField(default=False)
-    payment_id = models.CharField(default=get_random_string(10), unique=True, max_length=10)
+    payment_id = models.UUIDField(default=uuid.uuid1, unique=True)
 
     def __str__(self) -> str:
-        return self.payment_id
+        return str(self.payment_id)
     
 
 
 class Appointment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
-    created_at = models.DateField(auto_now_add=True)
-    last_updated_at = models.DateField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_updated_at = models.DateTimeField(auto_now=True)
 
-    schedule = models.ForeignKey(DoctorSchedule, on_delete=models.CASCADE, related_name="schedule_appointment_details")
+    schedule = models.ForeignKey(DoctorSchedule, on_delete=models.CASCADE, related_name="schedule_appointment_details", blank=True)
     appointment_date_time = models.DateTimeField()
     no_in_queuee = models.PositiveIntegerField(default=1)
     
@@ -53,5 +53,9 @@ class Booking(BaseModel):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="doctor_booking_profile")
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name="pharmacy_booking_profile")
     payment = models.OneToOneField(Payment, on_delete=models.CASCADE, related_name="payment_booking_details")
-    appointment = models.OneToOneField(Payment, on_delete=models.CASCADE, related_name="appointment_booking_detials")
+    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name="appointment_booking_detials")
     status = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return str(self.appointment)
+    
